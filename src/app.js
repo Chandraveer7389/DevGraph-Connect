@@ -1,22 +1,32 @@
 const express = require("express");
 const app = express();
+const connectDB = require("./config/database");
+const user = require("./models/user");
+connectDB()
+  .then(() => {
+    console.log("Data base connected successfuly");
+    app.listen(7000, () => {
+      console.log("Server listening at the port");
+    });
+  })
+  .catch((err) => {
+    console.log("Data base connection failed");
+  });
 
-app.use("/admin", (req, res, next) => {
-  let token = "ab";
-  if (token === "a") {
-    next();
-  } else {
-    res.status(404).send("Not authorized");
+app.post("/signin", async (req, res) => {
+  const User = new user({
+    firstName : "Radha",
+    lastName : "Rani",
+    email : "Radha@gmail.com",
+    password : "Radha1234",
+    age : 19,
+    gender : "Female",
+  })
+
+  try {
+    await User.save();
+    res.send("Sign in data added successfully");
+  }catch (err) {
+
   }
-});
-
-app.delete("/admin/deleteData", (req, res) => {
-  res.send("Data deleted");
-});
-app.get("/admin/getData", (req, res) => {
-  res.send("user data");
-});
-
-app.listen(7000, () => {
-  console.log("Server listening at the port");
 });
