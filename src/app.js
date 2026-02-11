@@ -12,6 +12,12 @@ connectDB()
   .catch((err) => {
     console.log("Data base connection failed");
   });
+  app.get("/hello", (req,res) => {
+    res.send("Hello");
+  })
+  app.get("/", (req,res) => {
+    res.send("Hello");
+  })
 
 app.post("/signin", async (req, res) => {
   const User = new user({
