@@ -12,22 +12,11 @@ connectDB()
   .catch((err) => {
     console.log("Data base connection failed");
   });
-  app.get("/hello", (req,res) => {
-    res.send("Hello");
-  })
-  app.get("/", (req,res) => {
-    res.send("Hello");
-  })
-
+app.use(express.json());
 app.post("/signin", async (req, res) => {
-  const User = new user({
-    firstName : "Radha",
-    lastName : "Rani",
-    email : "Radha@gmail.com",
-    password : "Radha1234",
-    age : 19,
-    gender : "Female",
-  })
+  const User = new user(
+    req.body
+  )
 
   try {
     await User.save();
