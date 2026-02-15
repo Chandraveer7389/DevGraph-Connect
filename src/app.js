@@ -14,14 +14,27 @@ connectDB()
   });
 app.use(express.json());
 app.post("/signin", async (req, res) => {
-  const User = new user(
-    req.body
-  )
+  const User = new user(req.body);
 
   try {
     await User.save();
     res.send("Sign in data added successfully");
-  }catch (err) {
-
+  } catch (err) {}
+});
+app.delete("/deleteUser", async (req, res) => {
+  const userId = req.body.userId;
+  try {
+    const deletedUser = await user.findByIdAndDelete(userId);
+    res.send("User deleted successfully");
+  } catch (err) {
+    res.status(404).send("Not able to delete the user");
+  }
+});
+app.get("/users", async (req, res) => {
+  try {
+    const users = await user.find({});
+    res.send(users);
+  } catch (err) {
+    res.status(404).send("No user present");
   }
 });
