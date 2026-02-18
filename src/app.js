@@ -38,3 +38,15 @@ app.get("/users", async (req, res) => {
     res.status(404).send("No user present");
   }
 });
+app.patch("/updateUser", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+  try {
+    const u = await user.findByIdAndUpdate({ _id: userId }, data, {
+      returnDocument: "before",
+    });
+    res.send("Update successfully")
+  } catch (err) {
+    res.status(404).send("User not found");
+  }
+});
