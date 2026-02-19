@@ -19,7 +19,9 @@ app.post("/signin", async (req, res) => {
   try {
     await User.save();
     res.send("Sign in data added successfully");
-  } catch (err) {}
+  } catch (err) {
+    res.status(404).send("sign in error" + err.message)
+  }
 });
 app.delete("/deleteUser", async (req, res) => {
   const userId = req.body.userId;
