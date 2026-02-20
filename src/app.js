@@ -20,7 +20,7 @@ app.post("/signin", async (req, res) => {
     await User.save();
     res.send("Sign in data added successfully");
   } catch (err) {
-    res.status(404).send("sign in error" + err.message)
+    res.status(404).send("sign in error" + err.message);
   }
 });
 app.delete("/deleteUser", async (req, res) => {
@@ -43,13 +43,19 @@ app.get("/users", async (req, res) => {
 app.patch("/updateUser", async (req, res) => {
   const userId = req.body.userId;
   const data = req.body;
+
   try {
+    const Allower_Update = ["age", "firstName", "lastName", "userId"];
+    const doUpdate = Object.keys(data).every((k) => Allower_Update.includes(k));
+    if (!doUpdate) {
+      throw new Error("update not allowed");
+    }
     const u = await user.findByIdAndUpdate({ _id: userId }, data, {
       returnDocument: "before",
-      runValidators : true,
+      runValidators: true,
     });
-    res.send("Update successfully")
+    res.send("Update successfully");
   } catch (err) {
-    res.status(404).send("Request failed" + err.message);
+    res.status(404).send("Request failed: " + err.message);
   }
 });
