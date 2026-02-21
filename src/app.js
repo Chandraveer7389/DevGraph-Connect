@@ -1,7 +1,9 @@
 const express = require("express");
 const app = express();
 const connectDB = require("./config/database");
-const user = require("./models/user");
+const User = require("./models/user");
+const bcrypt = require('bcrypt');
+const {validate} = require("./utility/validate")
 connectDB()
   .then(() => {
     console.log("Data base connected successfuly");
@@ -14,10 +16,23 @@ connectDB()
   });
 app.use(express.json());
 app.post("/signin", async (req, res) => {
-  const User = new user(req.body);
-
+ 
+ // validate 
   try {
-    await User.save();
+    validate(req.body);
+    // 
+    const { firstName, lastName, email, password, age, gender, skills } = req.body;
+    const hashPassword = await bcrypt.hash(password, 10);
+     const user = new User({
+      firstName,
+      lastName,
+      email,
+      password: hashPassword, // Save the HASH, not the plain text!
+      age,
+      gender,
+      skills
+    });
+    await user.save();
     res.send("Sign in data added successfully");
   } catch (err) {
     res.status(404).send("sign in error" + err.message);
@@ -26,7 +41,7 @@ app.post("/signin", async (req, res) => {
 app.delete("/deleteUser", async (req, res) => {
   const userId = req.body.userId;
   try {
-    const deletedUser = await user.findByIdAndDelete(userId);
+    const deletedUser = await User.findByIdAndDelete(userId);
     res.send("User deleted successfully");
   } catch (err) {
     res.status(404).send("Not able to delete the user");
@@ -34,7 +49,7 @@ app.delete("/deleteUser", async (req, res) => {
 });
 app.get("/users", async (req, res) => {
   try {
-    const users = await user.find({});
+    const users = await User.find({});
     res.send(users);
   } catch (err) {
     res.status(404).send("No user present");
@@ -50,7 +65,7 @@ app.patch("/updateUser", async (req, res) => {
     if (!doUpdate) {
       throw new Error("update not allowed");
     }
-    const u = await user.findByIdAndUpdate({ _id: userId }, data, {
+    const u = await User.findByIdAndUpdate({ _id: userId }, data, {
       returnDocument: "before",
       runValidators: true,
     });
