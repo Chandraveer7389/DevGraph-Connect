@@ -3,7 +3,10 @@ const app = express();
 const connectDB = require("./config/database");
 const User = require("./models/user");
 const bcrypt = require('bcrypt');
-const {validate} = require("./utility/validate")
+const {validate} = require("./utility/validate");
+const cookieParser = require("cookie-parser");
+const jwt = require('jsonwebtoken');
+
 connectDB()
   .then(() => {
     console.log("Data base connected successfuly");
@@ -14,9 +17,10 @@ connectDB()
   .catch((err) => {
     console.log("Data base connection failed");
   });
+
 app.use(express.json());
+app.use(cookieParser());
 app.post("/signin", async (req, res) => {
- 
  // validate 
   try {
     validate(req.body);
@@ -47,6 +51,23 @@ app.delete("/deleteUser", async (req, res) => {
     res.status(404).send("Not able to delete the user");
   }
 });
+app.get("/profile", async (req,res) => {
+  
+  const {token} = req.cookies;
+  if(!token) {
+    throw new Error("Invalid token");
+  }
+  try{
+    const decoded = jwt.verify(token,"Secret_key_dev");
+    const user = await User.findById(decoded._id)
+    if(!user) {
+      throw new Error("User does not exist");
+    }
+    res.send(user)
+  }catch (err) {
+    res.status(404).send("Problem occured " + err);
+  }
+})
 app.get("/users", async (req, res) => {
   try {
     const users = await User.find({});
@@ -83,6 +104,8 @@ app.post("/login" ,async (req,res) => {
     }
     const isPassword =await bcrypt.compare(password,userId.password)
     if(isPassword) {
+      const token = jwt.sign({_id:userId._id},"Secret_key_dev")
+      res.cookie("token",token);
       res.send("Login successfull")
     } else {
       throw new Error("invalid password");
