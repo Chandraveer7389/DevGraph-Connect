@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const {validate} = require("./utility/validate");
 const cookieParser = require("cookie-parser");
 const jwt = require('jsonwebtoken');
+const {auth} = require("./middlewares/auth")
 
 connectDB()
   .then(() => {
@@ -51,22 +52,10 @@ app.delete("/deleteUser", async (req, res) => {
     res.status(404).send("Not able to delete the user");
   }
 });
-app.get("/profile", async (req,res) => {
-  
-  const {token} = req.cookies;
-  if(!token) {
-    throw new Error("Invalid token");
-  }
-  try{
-    const decoded = jwt.verify(token,"Secret_key_dev");
-    const user = await User.findById(decoded._id)
-    if(!user) {
-      throw new Error("User does not exist");
-    }
-    res.send(user)
-  }catch (err) {
-    res.status(404).send("Problem occured " + err);
-  }
+app.get("/profile", auth ,async (req,res) => {
+  const user = req.userxyz
+    res.send(user.firstName)
+
 })
 app.get("/users", async (req, res) => {
   try {
