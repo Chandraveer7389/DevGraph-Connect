@@ -91,9 +91,9 @@ app.post("/login" ,async (req,res) => {
     if(!userId) {
       throw new Error("Invalid email")
     }
-    const isPassword =await bcrypt.compare(password,userId.password)
+    const isPassword = await userId.validPassword(password)
     if(isPassword) {
-      const token = jwt.sign({_id:userId._id},"Secret_key_dev")
+      const token = await userId.getJwt()
       res.cookie("token",token);
       res.send("Login successfull")
     } else {
