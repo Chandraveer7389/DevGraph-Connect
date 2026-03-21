@@ -1,31 +1,26 @@
 const express = require("express")
 const {auth} = require("../middlewares/auth")
 const User = require("../models/user")
+const validateEditProfile = require("../utility/validateEditProfile")
 const profileRouter = express.Router()
 
-profileRouter.get("/user", auth ,async (req,res) => {
+profileRouter.get("/view", auth ,async (req,res) => {
   const user = req.userxyz
     res.send(user.firstName)
 
 })
 
-profileRouter.patch("/updateUser", async (req, res) => {
-  const userId = req.body.userId;
-  const data = req.body;
-
+profileRouter.patch("/edit",auth, async (req, res) => {
+  const user = req.userxyz
   try {
-    const Allower_Update = ["age", "firstName", "lastName", "userId"];
-    const doUpdate = Object.keys(data).every((k) => Allower_Update.includes(k));
-    if (!doUpdate) {
-      throw new Error("update not allowed");
-    }
-    const u = await User.findByIdAndUpdate({ _id: userId }, data, {
-      returnDocument: "before",
-      runValidators: true,
-    });
-    res.send("Update successfully");
+        if(!validateEditProfile(req)) {
+          throw new Error("Updates not allowed");
+        }
+      Object.keys(req.body).forEach((field) => user[field] = req.body[field])
+      await user.save()
+      res.send(user.firstName + " your Update is successfull")
   } catch (err) {
-    res.status(404).send("Request failed: " + err.message);
+    res.status(401).send("Request failed: " + err.message);
   }
 });
 

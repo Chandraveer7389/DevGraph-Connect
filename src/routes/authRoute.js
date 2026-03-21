@@ -46,4 +46,10 @@ authRoute.post("/signin", async (req, res) => {
     res.status(404).send("sign in error" + err.message);
   }
 });
+
+authRoute.post("/logout" ,(req,res) => {
+   // res.clearCookie("token");
+    res.cookie("token",null, {expires : new Date(Date.now())});
+    res.send("Log Out successfull")
+})
 module.exports = authRoute
