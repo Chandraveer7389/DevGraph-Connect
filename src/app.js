@@ -2,11 +2,10 @@ const express = require("express");
 const app = express();
 const connectDB = require("./config/database");
 const User = require("./models/user");
-const bcrypt = require('bcrypt');
-const {validate} = require("./utility/validate");
 const cookieParser = require("cookie-parser");
-const jwt = require('jsonwebtoken');
-const {auth} = require("./middlewares/auth")
+const authRoute = require("./routes/authRoute")
+const profileRouter = require("./routes/profileRouter")
+const requestRouter = require("./routes/requestRouter")
 
 connectDB()
   .then(() => {
@@ -21,42 +20,11 @@ connectDB()
 
 app.use(express.json());
 app.use(cookieParser());
-app.post("/signin", async (req, res) => {
- // validate 
-  try {
-    validate(req.body);
-    // 
-    const { firstName, lastName, email, password, age, gender, skills } = req.body;
-    const hashPassword = await bcrypt.hash(password, 10);
-     const user = new User({
-      firstName,
-      lastName,
-      email,
-      password: hashPassword, // Save the HASH, not the plain text!
-      age,
-      gender,
-      skills
-    });
-    await user.save();
-    res.send("Sign in data added successfully");
-  } catch (err) {
-    res.status(404).send("sign in error" + err.message);
-  }
-});
-app.delete("/deleteUser", async (req, res) => {
-  const userId = req.body.userId;
-  try {
-    const deletedUser = await User.findByIdAndDelete(userId);
-    res.send("User deleted successfully");
-  } catch (err) {
-    res.status(404).send("Not able to delete the user");
-  }
-});
-app.get("/profile", auth ,async (req,res) => {
-  const user = req.userxyz
-    res.send(user.firstName)
 
-})
+app.use("/",authRoute)
+app.use("/profile",profileRouter)
+app.use("/request",requestRouter)
+
 app.get("/users", async (req, res) => {
   try {
     const users = await User.find({});
@@ -65,41 +33,5 @@ app.get("/users", async (req, res) => {
     res.status(404).send("No user present");
   }
 });
-app.patch("/updateUser", async (req, res) => {
-  const userId = req.body.userId;
-  const data = req.body;
 
-  try {
-    const Allower_Update = ["age", "firstName", "lastName", "userId"];
-    const doUpdate = Object.keys(data).every((k) => Allower_Update.includes(k));
-    if (!doUpdate) {
-      throw new Error("update not allowed");
-    }
-    const u = await User.findByIdAndUpdate({ _id: userId }, data, {
-      returnDocument: "before",
-      runValidators: true,
-    });
-    res.send("Update successfully");
-  } catch (err) {
-    res.status(404).send("Request failed: " + err.message);
-  }
-});
-app.post("/login" ,async (req,res) => {
-  try{
-    const {email,password} = req.body;
-    const userId = await User.findOne({email : email})
-    if(!userId) {
-      throw new Error("Invalid email")
-    }
-    const isPassword = await userId.validPassword(password)
-    if(isPassword) {
-      const token = await userId.getJwt()
-      res.cookie("token",token);
-      res.send("Login successfull")
-    } else {
-      throw new Error("invalid password");
-    }
-  }catch (err) {
-    res.status(404).send("ERROR " + err.message);
-  }
-})
+
