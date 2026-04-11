@@ -31,7 +31,7 @@ profileRouter.patch("/changePassword", auth, async (req, res) => {
   const user = req.userxyz
   const {currentPassword, newPassword} = req.body;
   if(!validator.isStrongPassword(newPassword)) {
-    throw new Error("weak password")
+    throw new Error("weak password Found")
   }
   const isPassword =await user.validPassword(currentPassword)
   if(!isPassword) {
