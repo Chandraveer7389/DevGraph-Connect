@@ -20,8 +20,14 @@ const connectionRequestSchema = new mongoose.Schema({
         }
     }
 }, { timestamps: true }); 
-
-// Fixed model name typo and variable name
+connectionRequestSchema.pre('save', function() {
+  const connectionRequest = this
+  if(connectionRequest.toUserId.equals(connectionRequest.fromUserId)){
+    throw new Error("Can't send request to yourself");
+  }
+}
+);
+connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 });
 const ConnectionRequestModel = new mongoose.model("ConnectionRequest", connectionRequestSchema);
 
 module.exports = ConnectionRequestModel;
