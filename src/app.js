@@ -5,7 +5,8 @@ const User = require("./models/user");
 const cookieParser = require("cookie-parser");
 const authRoute = require("./routes/authRoute")
 const profileRouter = require("./routes/profileRouter")
-const requestRouter = require("./routes/requestRouter")
+const requestRouter = require("./routes/requestRouter");
+const userRouter = require("./routes/user");
 
 connectDB()
   .then(() => {
@@ -24,14 +25,7 @@ app.use(cookieParser());
 app.use("/",authRoute)
 app.use("/profile",profileRouter)
 app.use("/request",requestRouter)
+app.use("/user",userRouter)
 
-app.get("/users", async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (err) {
-    res.status(404).send("No user present");
-  }
-});
 
 
