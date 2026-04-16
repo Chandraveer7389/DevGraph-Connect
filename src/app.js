@@ -7,7 +7,7 @@ const authRoute = require("./routes/authRoute")
 const profileRouter = require("./routes/profileRouter")
 const requestRouter = require("./routes/requestRouter");
 const userRouter = require("./routes/user");
-
+const cors = require("cors")
 connectDB()
   .then(() => {
     console.log("Data base connected successfuly");
@@ -19,6 +19,11 @@ connectDB()
     console.log("Data base connection failed");
   });
 
+
+app.use(cors({
+  origin : "http://localhost:5173",
+  credentials : true
+}))
 app.use(express.json());
 app.use(cookieParser());
 

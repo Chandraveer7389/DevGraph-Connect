@@ -15,7 +15,7 @@ authRoute.post("/login" ,async (req,res) => {
     if(isPassword) {
       const token = await userId.getJwt()
       res.cookie("token",token);
-      res.send("Login successfull")
+      res.send(userId)
     } else {
       throw new Error("invalid password");
     }
