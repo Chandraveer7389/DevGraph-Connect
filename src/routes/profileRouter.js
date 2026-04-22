@@ -8,7 +8,7 @@ const profileRouter = express.Router()
 
 profileRouter.get("/view", auth ,async (req,res) => {
   const user = req.userxyz
-    res.send(user.firstName)
+    res.send(user)
 
 })
 

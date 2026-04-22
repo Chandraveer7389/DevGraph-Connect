@@ -32,8 +32,8 @@ userRouter.get("/connections", auth, async (req, res) => {
             {fromUserId : loggedInUser._id, status:"accepted"},
             {toUserId : loggedInUser._id, status:"accepted"}
             ]
-        }).populate("fromUserId" , ["firstName", "lastName"])
-        .populate("toUserId" , ["firstName", "lastName"])
+        }).populate("fromUserId" , ["firstName", "lastName", "age" , "skills"])
+        .populate("toUserId" , ["firstName", "lastName", "age", "skills", ])
 
         const data = connections.map((row) => { 
             if(row.fromUserId._id.toString() === loggedInUser._id.toString()) {
@@ -78,7 +78,7 @@ userRouter.get("/feed", auth, async (req, res) => {
                 {_id : {$nin : Array.from(hideUsers)}},
                 {_id :{$ne : loggedInUser._id}}
             ]
-        }).select("firstName lastName").skip(skip).limit(limit)
+        }).select("firstName lastName age gender skills").skip(skip).limit(limit)
         res.send(feedUser)
 
     }catch(err) {
