@@ -10,7 +10,7 @@ userRouter.get("/pending/requests", auth , async (req, res) => {
         const connectionRequest = await ConnectionRequestModel.find({
             toUserId : loggedInUser._id,
             status : "interested"
-        }).populate("fromUserId" , ["firstName", "lastName"])
+        }).populate("fromUserId" , ["firstName", "lastName" , "skills" , "age" , "gender"])
         const data = connectionRequest.map((row) => row.fromUserId)
         res.send({
             message : "Data Fetched Successfully",
