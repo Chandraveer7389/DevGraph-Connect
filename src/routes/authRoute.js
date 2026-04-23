@@ -24,7 +24,7 @@ authRoute.post("/login" ,async (req,res) => {
   }
 })
 
-authRoute.post("/signin", async (req, res) => {
+authRoute.post("/signup", async (req, res) => {
  // validate 
   try {
     validate(req.body);
@@ -40,8 +40,12 @@ authRoute.post("/signin", async (req, res) => {
       gender,
       skills
     });
-    await user.save();
-    res.send("Sign in data added successfully");
+    const savedUser = await user.save();
+    const token = await savedUser.getJwt()
+    res.cookie("token",token);
+    res.send({message :"Sign in data added successfully",
+      data : savedUser
+    });
   } catch (err) {
     res.status(404).send("sign in error" + err.message);
   }
