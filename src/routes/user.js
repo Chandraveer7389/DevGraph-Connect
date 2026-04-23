@@ -10,7 +10,7 @@ userRouter.get("/pending/requests", auth , async (req, res) => {
         const connectionRequest = await ConnectionRequestModel.find({
             toUserId : loggedInUser._id,
             status : "interested"
-        }).populate("fromUserId" , ["firstName", "lastName" , "skills" , "age" , "gender"])
+        }).populate("fromUserId" , ["firstName", "lastName" , "skills" , "age" , "gender" , "photoUrl"])
         const data = connectionRequest.map((row) => row.fromUserId)
         res.send({
             message : "Data Fetched Successfully",
@@ -32,8 +32,8 @@ userRouter.get("/connections", auth, async (req, res) => {
             {fromUserId : loggedInUser._id, status:"accepted"},
             {toUserId : loggedInUser._id, status:"accepted"}
             ]
-        }).populate("fromUserId" , ["firstName", "lastName", "age" , "skills"])
-        .populate("toUserId" , ["firstName", "lastName", "age", "skills", ])
+        }).populate("fromUserId" , ["firstName", "lastName", "age" , "skills", "photoUrl"])
+        .populate("toUserId" , ["firstName", "lastName", "age", "skills", "photoUrl"])
 
         const data = connections.map((row) => { 
             if(row.fromUserId._id.toString() === loggedInUser._id.toString()) {
@@ -78,7 +78,7 @@ userRouter.get("/feed", auth, async (req, res) => {
                 {_id : {$nin : Array.from(hideUsers)}},
                 {_id :{$ne : loggedInUser._id}}
             ]
-        }).select("firstName lastName age gender skills").skip(skip).limit(limit)
+        }).select("firstName lastName age gender skills photoUrl").skip(skip).limit(limit)
         res.send(feedUser)
 
     }catch(err) {

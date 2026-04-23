@@ -49,13 +49,18 @@ const userSchema = new mongoose.Schema(
       default:
         "https://png.pngtree.com/png-vector/20250512/ourmid/pngtree-default-avatar-profile-icon-gray-placeholder-vector-png-image_16213764.png",
       validate(value) {
-        if (!validator.isURL(value)) {
-          throw new Error("Invalid Photo URL: " + value);
+        // Check if it's a standard URL OR if it starts with "data:image"
+        const isBase64 = value.startsWith("data:image");
+        const isStandardURL = validator.isURL(value);
+
+        if (!isBase64 && !isStandardURL) {
+          throw new Error(
+            "Invalid Photo: Must be a valid URL or a Base64 image string.",
+          );
         }
       },
     },
     about: {
-      
       type: String,
       default: "This is a default bio of the user!",
       maxLength: 250,
