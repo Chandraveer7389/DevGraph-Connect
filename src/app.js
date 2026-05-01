@@ -7,6 +7,7 @@ const authRoute = require("./routes/authRoute")
 const profileRouter = require("./routes/profileRouter")
 const requestRouter = require("./routes/requestRouter");
 const userRouter = require("./routes/user");
+require('./utility/cronjobs');
 const cors = require("cors")
 connectDB()
   .then(() => {
