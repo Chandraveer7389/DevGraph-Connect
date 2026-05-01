@@ -7,13 +7,14 @@ const authRoute = require("./routes/authRoute")
 const profileRouter = require("./routes/profileRouter")
 const requestRouter = require("./routes/requestRouter");
 const userRouter = require("./routes/user");
-require('./utility/cronjobs');
+const startCleanupJob = require('./utility/cronjobs');
 const cors = require("cors")
 connectDB()
   .then(() => {
     console.log("Data base connected successfuly");
     app.listen(7000, () => {
       console.log("Server listening at the port");
+      startCleanupJob()
     });
   })
   .catch((err) => {
